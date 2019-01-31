@@ -1,16 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using System;
+﻿using System.Collections.Generic;
 using System.Linq;
-
+using UnityEditor;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 public class DennisTools : EditorWindow
 {
     private enum MenuState { QuickSelectionSet, NewTitle }
+
     private enum ModifierState { Default, Delete, Update }
+
     private ModifierState modState = ModifierState.Default;
     private MenuState menuState = MenuState.QuickSelectionSet;
     private static EditorWindow window;
@@ -24,9 +23,9 @@ public class DennisTools : EditorWindow
         window.titleContent = new GUIContent("Dennis Tools", EditorGUIUtility.Load("DennisTools/Dennis Tools.png") as Texture);
     }
 
-    GUILayoutOption[] buttonStyle = { GUILayout.MinHeight(32f), GUILayout.MinWidth(32f) };
-    GUILayoutOption[] smallButtonStyle = { GUILayout.MinHeight(32f), GUILayout.ExpandWidth(false) };
-    Color setColor = Color.white;
+    private GUILayoutOption[] buttonStyle = { GUILayout.MinHeight(32f), GUILayout.MinWidth(32f) };
+    private GUILayoutOption[] smallButtonStyle = { GUILayout.MinHeight(32f), GUILayout.ExpandWidth(false) };
+    private Color setColor = Color.white;
 
     public void OnGUI()
     {
@@ -37,9 +36,11 @@ public class DennisTools : EditorWindow
                 QuickSelectHeader();
                 QuickSelectSetButtons();
                 break;
+
             case MenuState.NewTitle:
                 EnterNewText();
                 break;
+
             default:
                 break;
         }
@@ -68,6 +69,7 @@ public class DennisTools : EditorWindow
     }
 
     private string newText = "New Set 1";
+
     private void EnterNewText()
     {
         Event e = Event.current;
@@ -81,7 +83,7 @@ public class DennisTools : EditorWindow
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Accept", buttonStyle) || e.type == EventType.KeyDown 
+        if (GUILayout.Button("Accept", buttonStyle) || e.type == EventType.KeyDown
             && (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter))
         {
             menuState = MenuState.QuickSelectionSet;
@@ -128,10 +130,7 @@ public class DennisTools : EditorWindow
             }
         }
         EditorGUILayout.EndHorizontal();
-
     }
-
-    Vector2 scrollView;
 
     private void QuickSelectSetButtons()
     {
@@ -141,12 +140,15 @@ public class DennisTools : EditorWindow
             case ModifierState.Default:
                 EditorGUILayout.LabelField("Sets", EditorStyles.boldLabel);
                 break;
+
             case ModifierState.Delete:
                 EditorGUILayout.LabelField("Sets (Deleting)", EditorStyles.boldLabel);
                 break;
+
             case ModifierState.Update:
                 EditorGUILayout.LabelField("Sets (Updating)", EditorStyles.boldLabel);
                 break;
+
             default:
                 break;
         }
@@ -173,12 +175,15 @@ public class DennisTools : EditorWindow
                         case ModifierState.Default:
                             Selection.objects = set.objects;
                             break;
+
                         case ModifierState.Delete:
                             DeleteSet(set);
                             break;
+
                         case ModifierState.Update:
                             UpdateSet(set);
                             break;
+
                         default:
                             break;
                     }
@@ -199,15 +204,11 @@ public class DennisTools : EditorWindow
         newObjects = newObjects.Union(oldObjects);
 
         set.objects = newObjects.ToArray();
-        int start = set.Name.IndexOf("(");
-        set.Name = set.Name.Remove(start-1);
-        set.Name = $"{set.Name} ({set.objects.Length})";
-
     }
 
     private void DeleteSet(SelectionSet setToDelete)
     {
-        if (EditorUtility.DisplayDialog("Deleting", $"Are you sure you want to delete \"{setToDelete.Name}\" containing {setToDelete.objects.Length} objects?", "Yes", "Cancel"))
+        if (EditorUtility.DisplayDialog("Deleting", $"Are you sure you want to delete \"{setToDelete.Name}\"?", "Yes", "Cancel"))
         {
             selectionSets.Remove(setToDelete);
         }
@@ -236,10 +237,9 @@ public class DennisTools : EditorWindow
 
     private void AddNewSet()
     {
-        SelectionSet newSet = new SelectionSet($"{newText} ({Selection.objects.Length})", Selection.objects);
+        SelectionSet newSet = new SelectionSet($"{newText}", Selection.objects);
         selectionSets.Add(newSet);
         ShowNotification(new GUIContent($"{newSet.Name} added."));
-
     }
 
     private void FixDefaultSetName()
